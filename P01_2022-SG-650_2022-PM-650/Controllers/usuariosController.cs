@@ -100,9 +100,34 @@ namespace P01_2022_SG_650_2022_PM_650.Controllers
             return Ok(usuario);
         }
 
-        //
+        //endpoint para validar credenciales (usuario/contraseña) y retornar si son válidas o invalidas las credenciales.
+        // en base a correo/contraseña
 
-        
+        [HttpPost]
+        [Route("login")]
+
+        public async Task<IActionResult> Login(string correo, string contrasena)
+        {
+            if (string.IsNullOrEmpty(correo) || string.IsNullOrEmpty(contrasena))
+            {
+                return BadRequest("Correo o contraseña no pueden estar vacíos.");
+            }
+            var usuario = await _ReservasContext.usuario
+                                        .Where(u => u.correo == correo)
+                                        .FirstOrDefaultAsync();
+
+            if (usuario == null)
+            {
+                return Unauthorized("Correo no encontrado.");
+            }
+
+            if (usuario.contrasena != contrasena)
+            {
+                return Unauthorized("Contraseña incorrecta.");
+            }
+
+            return Ok(new { message = "Credenciales válidas", usuario = usuario.nombre });
+        }
 
 
     }
