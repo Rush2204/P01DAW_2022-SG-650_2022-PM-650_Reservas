@@ -2,7 +2,7 @@
 
 namespace P01_2022_SG_650_2022_PM_650.Models
 {
-    public class Sucursales
+    public class Sucursal
     {
         [Key]
         public int id_sucursal { get; set; }
@@ -10,6 +10,6 @@ namespace P01_2022_SG_650_2022_PM_650.Models
         public string direccion { get; set; }
         public string telefono { get; set; }
         public string administrador { get; set; }
-        public string numeroEspacio { get; set; }
+        public int numeroEspacio { get; set; }
     }
 }
