@@ -94,5 +94,72 @@ namespace P01_2022_SG_650_2022_PM_650.Controllers
             return Ok(reserva);
         }
 
+        //Mostrar una lista de reservas activas del usuario.
+
+        [HttpPost]
+        [Route("reservas/activas/{id_usuario}")]
+        public IActionResult ReservasActivas(int id_usuario) 
+        {
+            try
+            {
+                var reservasActivas = from reserva in _ReservasContext.reserva
+                                      join usuario in _ReservasContext.usuario on reserva.id_usuario equals usuario.id_usuario
+                                      where reserva.id_usuario == id_usuario && reserva.Estado == true
+                                      select new
+                                      {
+                                          reserva.id_reserva,
+                                          reserva.id_usuario,
+                                          nombre_usuario = usuario.nombre,  
+                                          reserva.id_espacio,
+                                          reserva.fecha,
+                                          reserva.horaInicio,
+                                          reserva.cantidadHoras,
+                                          reserva.Estado
+                                      };
+
+                var listaReservas = reservasActivas.ToList();
+
+                if (listaReservas.Count == 0)
+                {
+                    return NotFound(new { message = "No se encontraron reservas activas para este usuario." });
+                }
+
+                return Ok(listaReservas);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error al obtener las reservas activas: {ex.Message}");
+            }
+        }
+
+        //Cancelar una reserva antes de su uso
+
+        [HttpPut]
+        [Route("reservas/cancelar/{id_reserva}")]
+        public IActionResult CancelarReserva(int id_reserva)
+        {
+            try
+            {
+                var reserva = _ReservasContext.reserva.FirstOrDefault(r => r.id_reserva == id_reserva);
+
+                if (reserva == null)
+                {
+                    return NotFound(new { message = "Reserva no encontrada." });
+                }
+
+                // Se cambia el estado :)
+                reserva.Estado = false;
+                _ReservasContext.SaveChanges();
+
+                return Ok(new { message = "Reserva cancelada con éxito." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error al cancelar la reserva: {ex.Message}");
+            }
+        }
+
+
+
     }
 }
