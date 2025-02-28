@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+
 namespace P01_2022_SG_650_2022_PM_650.Models
 {
     public class EspaciosParqueo
