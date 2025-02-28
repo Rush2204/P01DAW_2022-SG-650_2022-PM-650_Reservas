@@ -31,24 +31,80 @@ namespace P01_2022_SG_650_2022_PM_650.Controllers
             return Ok(listadoReserva);
         }
 
-        // Para agregar un nuevo registro:
+        /*
+            Nota: Seguir el siguiente formato para colocar las fechas y el tiempo de forma correcta:
+
+            Formato para fechas: 2025-02-28 
+
+            Borrar: }
+                    "hour": 0,
+                    "minute": 0
+                    }
+
+            en lo siguiente:
+
+            {
+              "id_reserva": 0,
+              "id_usuario": 0,
+              "id_espacio": 0,
+              "fecha": "2025-02-28",
+              "horaInicio": {
+                "hour": 0,
+                "minute": 0
+              },
+              "cantidadHoras": 0,
+              "estado": true
+            }
+
+            Y comolar la hora con el formato HH:mm : ejemplo "4:30"
+
+            como se muestra a continuación:
+            {
+              "id_reserva": 0,
+              "id_usuario": 0,
+              "id_espacio": 0,
+              "fecha": "2025-02-28",
+              "horaInicio": "15:45",
+              "cantidadHoras": 0,
+              "estado": true
+            }
+        */
+
+        // Permitir a un usuario reservar un espacio disponible, indicando fecha, hora y cantidad de horas a reservar.
 
         [HttpPost]
         [Route("Add")]
-
-        public IActionResult GuardarReserva([FromBody] Reserva reservas)
+        public IActionResult GuardarReserva([FromBody] Reserva reserva)
         {
             try
             {
-                _ReservasContext.reserva.Add(reservas);
+                var espacioDisponible = (from r in _ReservasContext.reserva
+                                         where r.id_espacio == reserva.id_espacio
+                                               && r.Estado == true
+                                               && r.fecha.Date == reserva.fecha.Date
+                                               && r.horaInicio < reserva.horaInicio.AddMinutes(reserva.cantidadHoras * 60)
+                                               && r.horaInicio.AddMinutes(r.cantidadHoras * 60) > reserva.horaInicio
+                                         select r).FirstOrDefault();
+
+                if (espacioDisponible != null)
+                {
+                    return BadRequest("El espacio seleccionado ya está reservado en el horario indicado.");
+                }
+
+                reserva.Estado = true; 
+                _ReservasContext.reserva.Add(reserva);
                 _ReservasContext.SaveChanges();
-                return Ok(reservas);
+
+                return Ok(reserva);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
         }
+
+
+
 
         // Para actualizar un registro
 
