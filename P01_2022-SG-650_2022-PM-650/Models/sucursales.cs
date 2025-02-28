@@ -2,7 +2,7 @@
 
 namespace P01_2022_SG_650_2022_PM_650.Models
 {
-    public class sucursales
+    public class Sucursales
     {
         [Key]
         public int id_sucursal { get; set; }

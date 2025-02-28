@@ -2,7 +2,7 @@
 
 namespace P01_2022_SG_650_2022_PM_650.Models
 {
-    public class usuarios
+    public class Usuarios
     {
         [Key]
         public int id_usuario { get; set; }
